@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AutoMapper;
 using Commander.Data;
@@ -29,7 +30,7 @@ namespace Commander.Controllers {
     }
 
     // Get api/commands/{id}
-    [HttpGet ("{id}")]
+    [HttpGet ("{id}", Name = "GetCommandById")]
     public ActionResult<CommandReadDto> GetCommandById (int id) {
       var commendItem = _repository.GetCommandById (id);
       if (commendItem != null) {
@@ -37,6 +38,19 @@ namespace Commander.Controllers {
       } else {
         return NotFound ();
       }
+    }
+
+    // Post api/commands
+    public ActionResult<CommandReadDto> CreateCommand (CommandCreateDto commandCreateDto) {
+      var commandModel = _mapper.Map<Command> (commandCreateDto);
+      _repository.CreateCommand (commandModel);
+      _repository.SaveChanges ();
+      var commandReadDto = _mapper.Map<CommandReadDto> (commandModel);
+
+      // can see microsoft document about CreatedAtRoute
+      // Postman會回傳這Command的取得路由而且是201 status code.
+      return CreatedAtRoute (nameof (GetCommandById), new { Id = commandReadDto.Id }, commandReadDto);
+      // return Ok (commandReadDto);
     }
   }
 }
