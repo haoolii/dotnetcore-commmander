@@ -4,6 +4,7 @@ using AutoMapper;
 using Commander.Data;
 using Commander.Dtos;
 using Commander.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Commander.Controllers {
@@ -66,6 +67,39 @@ namespace Commander.Controllers {
       _repository.SaveChanges ();
 
       return NoContent ();
+    }
+
+    // PATCH api/commands/{id}
+    [HttpPatch ("{id}")]
+    public ActionResult PartialCommandUpdate (int id, JsonPatchDocument<CommandUpdateDto> patchDoc) {
+      // 取得commandModel
+      var commandModelFromRepo = _repository.GetCommandById (id);
+      // 如果不存在要回NotFound
+      if (commandModelFromRepo == null) {
+        return NotFound ();
+      }
+
+      // 目標model轉成dto
+      var commandToPatch = _mapper.Map<CommandUpdateDto> (commandModelFromRepo);
+
+      // 傳進來的pathdoc蓋上去commandToPathch
+      patchDoc.ApplyTo (commandToPatch, ModelState);
+
+      // 驗證一下model
+      if (!TryValidateModel (commandToPatch)) {
+        return ValidationProblem (ModelState);
+      }
+
+      // 把path完成的Dto蓋上Model達到更新
+      _mapper.Map (commandToPatch, commandModelFromRepo);
+
+      // 沒效
+      _repository.UpdateCommand (commandModelFromRepo);
+
+      _repository.SaveChanges ();
+
+      return NoContent ();
+
     }
   }
 }
