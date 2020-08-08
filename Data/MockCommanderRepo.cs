@@ -8,6 +8,10 @@ namespace Commander.Data {
       throw new System.NotImplementedException ();
     }
 
+    public void DeleeteCommand (Command cmd) {
+      throw new System.NotImplementedException ();
+    }
+
     public IEnumerable<Command> GetAllCommands () {
       var commands = new List<Command> {
         new Command { Id = 0, HowTo = "Boild an egg", Line = "Boil water", Platform = "Pan" },

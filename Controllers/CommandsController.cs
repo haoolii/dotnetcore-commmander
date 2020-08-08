@@ -99,7 +99,20 @@ namespace Commander.Controllers {
       _repository.SaveChanges ();
 
       return NoContent ();
+    }
 
+    // DElETE api/commands/{id}
+    [HttpDelete ("{id}")]
+    public ActionResult DeleteCommand (int id) {
+      // 取得commandModel
+      var commandModelFromRepo = _repository.GetCommandById (id);
+      // 如果不存在要回NotFound
+      if (commandModelFromRepo == null) {
+        return NotFound ();
+      }
+      _repository.DeleeteCommand (commandModelFromRepo);
+      _repository.SaveChanges ();
+      return NoContent ();
     }
   }
 }
