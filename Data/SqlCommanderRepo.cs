@@ -29,5 +29,9 @@ namespace Commander.Data {
     public bool SaveChanges () {
       return (_context.SaveChanges () >= 0);
     }
+
+    public void UpdateCommand (Command cmd) {
+      // throw new NotImplementedException ();
+    }
   }
 }

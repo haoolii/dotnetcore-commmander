@@ -41,6 +41,7 @@ namespace Commander.Controllers {
     }
 
     // Post api/commands
+    [HttpPost]
     public ActionResult<CommandReadDto> CreateCommand (CommandCreateDto commandCreateDto) {
       var commandModel = _mapper.Map<Command> (commandCreateDto);
       _repository.CreateCommand (commandModel);
@@ -51,6 +52,20 @@ namespace Commander.Controllers {
       // Postman會回傳這Command的取得路由而且是201 status code.
       return CreatedAtRoute (nameof (GetCommandById), new { Id = commandReadDto.Id }, commandReadDto);
       // return Ok (commandReadDto);
+    }
+
+    //PUT api/commands/{id}
+    [HttpPut ("{id}")]
+    public ActionResult UpdateCommand (int id, CommandUpdateDto commandUpdateDto) {
+      var commandModelFromRepo = _repository.GetCommandById (id);
+      if (commandModelFromRepo == null) {
+        return NotFound ();
+      }
+      _mapper.Map (commandUpdateDto, commandModelFromRepo);
+      _repository.UpdateCommand (commandModelFromRepo);
+      _repository.SaveChanges ();
+
+      return NoContent ();
     }
   }
 }
